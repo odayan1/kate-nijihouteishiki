@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>二次方程式マスター | KATEぷら</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --blue:#2fbdea; --blue-d:#1aa3d0; --green:#8dc63f; --yellow:#f7d000;
+    --ink:#2b3a45; --muted:#6b7c88; --bg:#f4fbfe; --card:#ffffff;
+    --line:#e4eef4; --good:#38b26b; --bad:#e8624a;
+    --shadow:0 6px 22px rgba(28,120,160,.10);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
+    color:var(--ink);background:linear-gradient(180deg,#eaf7fd 0%,var(--bg) 240px);
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:var(--card);border-bottom:3px solid var(--blue);
+    box-shadow:0 2px 12px rgba(28,120,160,.08);position:sticky;top:0;z-index:50;
+  }
+  .head-inner{
+    max-width:980px;margin:0 auto;padding:10px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .title-wrap h1{margin:0;font-size:1.35rem;letter-spacing:.5px}
+  .title-wrap .sub{color:var(--muted);font-size:.8rem;margin-top:2px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:104px;width:auto;display:block}
+  .brand .tag{font-size:.92rem;font-weight:800;color:var(--green);text-align:right;line-height:1.35}
+  .brand .tag small{display:block;font-size:.66rem;font-weight:600;color:var(--muted);margin-top:2px}
+  .tabs{max-width:980px;margin:18px auto 0;padding:0 20px;display:flex;gap:10px}
+  .tab{
+    flex:1;padding:13px 8px;border:none;border-radius:14px 14px 0 0;cursor:pointer;
+    font-size:1.02rem;font-weight:700;background:#dceef6;color:var(--muted);
+    transition:.15s;border-bottom:4px solid transparent;
+  }
+  .tab.active{background:var(--card);color:var(--blue-d);border-bottom-color:var(--blue);box-shadow:var(--shadow)}
+  .tab .ic{font-size:1.1rem;margin-right:4px}
+  main{max-width:980px;margin:0 auto;padding:0 20px 60px}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{
+    background:var(--card);border-radius:16px;padding:22px 22px;margin:16px 0;
+    box-shadow:var(--shadow);border:1px solid var(--line);
+  }
+  .card h2{margin:0 0 4px;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+  .card h2 .bar{width:6px;height:22px;border-radius:3px;background:var(--blue)}
+  .card h2.green .bar{background:var(--green)}
+  .card h2.yellow .bar{background:var(--yellow)}
+  .card h2.orange .bar{background:#f7a600}
+  .card h2.purple .bar{background:#9b7ede}
+  .lead{color:var(--muted);font-size:.92rem;margin:2px 0 16px;line-height:1.65}
+  .derive{background:#fffdf0;border:1px dashed var(--yellow);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:.95rem;text-align:left;line-height:1.7}
+  .slider{width:100%;margin:6px 0}
+  input[type=range]{width:100%;accent-color:var(--blue)}
+  .val-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+  .val-cell{background:#f5fbfe;border:1px solid var(--line);border-radius:12px;padding:12px 6px;text-align:center}
+  .val-cell .lab{font-size:.82rem;color:var(--muted);margin-bottom:6px}
+  .val-cell .lab b{color:var(--ink)}
+  .val-cell .num{font-size:1.15rem;font-weight:700}
+  .quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .quick button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;cursor:pointer;font-size:.85rem;color:var(--blue-d);font-weight:700}
+  .quick button:hover{background:#eaf7fd}
+  /* ---- 中心装置：放物線 ---- */
+  .abc-wrap{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start;justify-content:center}
+  .abc-graph{flex:0 0 320px;background:#f7fcff;border:1px solid var(--line);border-radius:14px;padding:10px}
+  .abc-controls{flex:1;min-width:260px}
+  .abc-eq{font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:10px;color:var(--blue-d);min-height:34px}
+  .abc-slider-row{display:flex;align-items:center;gap:10px;margin:10px 0}
+  .abc-slider-row label{width:96px;font-weight:800;flex-shrink:0}
+  .reco-badge{margin-top:14px;background:#eafaf0;border:1px solid var(--good);color:#256b45;border-radius:12px;padding:10px 14px;font-weight:700;font-size:.92rem;text-align:center}
+  .reco-badge.none{background:#fdeeea;border-color:var(--bad);color:#8a2e1f}
+  /* ---- 手順ステップ表示 ---- */
+  .step-box{margin-top:14px}
+  .step-line{background:#f5fbfe;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:8px;
+    padding:10px 14px;margin:8px 0;opacity:0;transform:translateY(6px);transition:.3s;font-size:1.02rem}
+  .step-line.show{opacity:1;transform:none}
+  .step-line .step-tag{display:inline-block;background:var(--blue);color:#fff;font-size:.72rem;font-weight:800;
+    border-radius:10px;padding:1px 9px;margin-right:8px;vertical-align:middle}
+  .step-btn-row{text-align:center;margin-top:12px}
+  .step-btn{background:var(--blue);color:#fff;border:none;padding:10px 26px;border-radius:22px;font-weight:800;
+    cursor:pointer;font-size:.95rem;box-shadow:var(--shadow)}
+  .step-btn:hover{background:var(--blue-d)}
+  .step-btn:disabled{background:#c7dbe4;cursor:default;box-shadow:none}
+  .step-reset{background:#fff;color:var(--blue-d);border:1px solid var(--blue);padding:9px 20px;border-radius:22px;
+    font-weight:800;cursor:pointer;font-size:.88rem;margin-left:8px}
+  /* ---- いつ使える bar ---- */
+  .when-badge{display:inline-block;background:#eef4ff;color:#2f5bd0;border-radius:10px;padding:4px 12px;font-weight:800;font-size:.84rem;margin-bottom:10px}
+  /* ---- フローチャート ---- */
+  .flow{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:10px}
+  .flow-box{background:#f5fbfe;border:2px solid var(--blue);border-radius:14px;padding:12px 20px;text-align:center;
+    font-weight:700;max-width:480px;width:100%}
+  .flow-box.q{border-color:#9b7ede;background:#f7f4fd}
+  .flow-arrow{font-size:1.4rem;color:var(--muted);margin:2px 0}
+  .flow-branch{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;width:100%;margin:4px 0}
+  .flow-branch .flow-box{flex:1;min-width:180px}
+  .flow-yn{font-size:.78rem;color:var(--muted);font-weight:800;margin-bottom:-2px}
+  .flow-result{background:#eafaf0;border-color:var(--good);color:#256b45}
+  /* ---- 問題モード切替 ---- */
+  .qmode-tabs{display:flex;gap:8px;margin:16px 0 0;flex-wrap:wrap}
+  .qmode{flex:1;min-width:110px;padding:11px 6px;border:2px solid var(--line);background:#fff;border-radius:12px;font-size:.92rem;font-weight:800;color:var(--muted);cursor:pointer;transition:.12s}
+  .qmode:hover{border-color:var(--blue)}
+  .qmode.active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:var(--shadow)}
+  .qmode.mix.active{background:linear-gradient(90deg,var(--blue),var(--green))}
+  /* ---- quiz ---- */
+  .quiz-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+  .score{font-weight:800;color:var(--blue-d)}
+  .streak{background:var(--yellow);color:#6b5900;border-radius:20px;padding:3px 12px;font-size:.85rem;font-weight:800}
+  .timer-wrap{display:flex;align-items:center;gap:12px;margin:6px 2px 2px}
+  .timer-bar{flex:1;height:14px;background:#e9f3f8;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+  .timer-fill{height:100%;width:100%;border-radius:8px;background:linear-gradient(90deg,var(--green),var(--blue));transition:width .1s linear}
+  .timer-fill.warn{background:linear-gradient(90deg,#f7b500,#f7d000)}
+  .timer-fill.danger{background:linear-gradient(90deg,#e8624a,#f78b3a)}
+  .timer-num{font-weight:800;color:var(--blue-d);min-width:56px;text-align:right;font-variant-numeric:tabular-nums}
+  .progress-dots{display:flex;gap:6px;justify-content:center;margin:12px 0 2px;flex-wrap:wrap}
+  .dot{width:16px;height:16px;border-radius:50%;background:#e2eef5;border:1px solid var(--line);transition:.2s}
+  .dot.ok{background:var(--good);border-color:var(--good);transform:scale(1.1)}
+  .dot.ng{background:var(--bad);border-color:var(--bad)}
+  .dot.cur{box-shadow:0 0 0 3px rgba(47,189,234,.35);border-color:var(--blue)}
+  .result{display:none;text-align:center;padding:10px 6px 4px;animation:fade .3s ease}
+  .result.show{display:block}
+  .result-emoji{font-size:4.4rem;line-height:1;animation:bounceIn .6s cubic-bezier(.2,1.4,.5,1)}
+  @keyframes bounceIn{0%{transform:scale(0) rotate(-20deg);opacity:0}70%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+  .result-rank{font-size:1.7rem;font-weight:900;margin:6px 0 2px;
+    background:linear-gradient(90deg,var(--blue),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .result-score{font-size:2.4rem;font-weight:900;color:var(--ink);margin:4px 0}
+  .result-score .small{font-size:1rem;color:var(--muted);font-weight:700}
+  .result-points{font-size:1.05rem;color:var(--blue-d);font-weight:700}
+  .result-points b{font-size:1.35rem}
+  .result-msg{color:var(--muted);margin:12px auto;max-width:420px;line-height:1.6}
+  .result-stars{font-size:1.9rem;letter-spacing:6px;margin:6px 0 4px;min-height:34px}
+  .result-stars .star{opacity:0;animation:starPop .4s forwards}
+  @keyframes starPop{from{opacity:0;transform:scale(.3) translateY(6px)}to{opacity:1;transform:none}}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:999;display:none}
+  #confetti.show{display:block}
+  .pts-pop{display:inline-block;margin-left:8px;font-weight:800;color:var(--good);animation:pop .4s ease}
+  @keyframes pop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+  .q-box{text-align:center;padding:14px}
+  .q-ask{font-size:1.4rem;font-weight:800;margin:6px 0 4px}
+  .q-hint{color:var(--muted);font-size:.85rem;margin-bottom:14px}
+  .choices{display:grid;grid-template-columns:1fr;gap:12px;max-width:520px;margin:0 auto}
+  .choice{
+    border:2px solid var(--line);background:#fff;border-radius:14px;padding:14px 10px;
+    font-size:1.1rem;cursor:pointer;transition:.12s;min-height:52px;display:flex;align-items:center;justify-content:center;
+  }
+  .choice:hover{border-color:var(--blue);background:#f2fbfe}
+  .choice.correct{border-color:var(--good);background:#eafaf0}
+  .choice.wrong{border-color:var(--bad);background:#fdeeea}
+  .choice:disabled{cursor:default}
+  .feedback{margin-top:16px;border-radius:12px;padding:14px 16px;display:none;text-align:left}
+  .feedback.show{display:block}
+  .feedback.ok{background:#eafaf0;border:1px solid var(--good)}
+  .feedback.ng{background:#fdeeea;border:1px solid var(--bad)}
+  .feedback .fb-head{font-weight:800;margin-bottom:6px}
+  .feedback .fb-head.ok{color:var(--good)}
+  .feedback .fb-head.ng{color:var(--bad)}
+  .feedback .fb-steps{margin-top:8px;font-size:.92rem;line-height:1.8}
+  .next-btn{
+    display:block;margin:16px auto 0;background:var(--blue);color:#fff;border:none;
+    padding:13px 34px;border-radius:26px;font-size:1.05rem;font-weight:800;cursor:pointer;box-shadow:var(--shadow)
+  }
+  .next-btn:hover{background:var(--blue-d)}
+  .footer-note{text-align:center;color:var(--muted);font-size:.78rem;margin:20px 0 0}
+  @media(max-width:520px){
+    .val-grid{grid-template-columns:1fr}
+    .brand .tag{display:none}
+    .title-wrap h1{font-size:1.1rem}
+    .abc-graph{flex:0 0 100%}
+    .abc-slider-row label{width:70px;font-size:.9rem}
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<header>
+  <div class="head-inner">
+    <div class="title-wrap">
+      <h1>🧮 二次方程式マスター</h1>
+      <div class="sub">解き方4パターンを完全攻略（平方根・因数分解・平方完成・解の公式）</div>
+    </div>
+    <div class="brand">
+      <div class="tag">つまずきを、プラスに。<small>KATEぷら</small></div>
+      <img src="logo.png" alt="KATEぷら">
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-tab="learn"><span class="ic">📖</span>学習</button>
+  <button class="tab" data-tab="quiz"><span class="ic">✏️</span>問題</button>
+</div>
+
+<main>
+<!-- ================= LEARN ================= -->
+<section class="panel active" id="learn">
+
+  <div class="card">
+    <h2><span class="bar"></span>① 二次方程式ってなに？</h2>
+    <p class="lead">$x$ の最高次数が $2$ の方程式を「二次方程式」といいます。一般形は次の通り。</p>
+    <div class="derive" style="text-align:center;font-size:1.1rem">
+      $$ax^2+bx+c=0 \quad (a\neq0)$$
+    </div>
+    <p class="lead" style="margin-top:12px">一次方程式（$x=$数）と違って、二次方程式の答え（解）は<b>最大2つ</b>あります。この後、解を求める方法を<b>全部で4パターン</b>紹介します。どれも使えるようになれば、どんな二次方程式が出ても解けます。</p>
+  </div>
+
+  <div class="card">
+    <h2 class="green"><span class="bar"></span>② 中心装置：$a,b,c$ を動かして「解＝グラフとx軸の交点」を見る</h2>
+    <p class="lead">$ax^2+bx+c=0$ の左辺を $y=ax^2+bx+c$ というグラフ（放物線）だと考えると、<b>方程式の解は「放物線がx軸と交わる点のx座標」</b>です。スライダーを動かして、放物線の形と解の個数の関係をつかもう。</p>
+    <div class="abc-wrap">
+      <div class="abc-graph">
+        <svg id="pb-svg" viewBox="0 0 320 260" width="320" height="260">
+          <line id="pb-xaxis" x1="10" y1="130" x2="310" y2="130" stroke="#c9dde8" stroke-width="1.5"/>
+          <line id="pb-yaxis" x1="160" y1="10" x2="160" y2="250" stroke="#c9dde8" stroke-width="1.5"/>
+          <path id="pb-curve" fill="none" stroke="#2fbdea" stroke-width="3"/>
+          <circle id="pb-root1" r="6" fill="#e8624a" style="display:none"/>
+          <circle id="pb-root2" r="6" fill="#e8624a" style="display:none"/>
+          <text x="298" y="124" font-size="11" fill="#6b7c88">x</text>
+          <text x="166" y="20" font-size="11" fill="#6b7c88">y</text>
+        </svg>
+      </div>
+      <div class="abc-controls">
+        <div class="abc-eq" id="abc-eq"></div>
+        <div class="abc-slider-row"><label>a = <b id="abc-a-val">1</b></label><input class="slider" type="range" id="abc-a" min="-3" max="3" step="1" value="1"></div>
+        <div class="abc-slider-row"><label>b = <b id="abc-b-val">-5</b></label><input class="slider" type="range" id="abc-b" min="-8" max="8" step="1" value="-5"></div>
+        <div class="abc-slider-row"><label>c = <b id="abc-c-val">6</b></label><input class="slider" type="range" id="abc-c" min="-10" max="10" step="1" value="6"></div>
+        <div class="val-grid" style="grid-template-columns:1fr 1fr">
+          <div class="val-cell"><div class="lab">判別式 <b>D=b²-4ac</b></div><div class="num" id="abc-D"></div></div>
+          <div class="val-cell"><div class="lab">実数解の個数</div><div class="num" id="abc-count"></div></div>
+        </div>
+        <div class="reco-badge" id="abc-reco"></div>
+        <div class="quick" id="abc-quick"></div>
+      </div>
+    </div>
+    <div class="derive">
+      <b>読み取り方：</b> 放物線が x 軸と <b>2点で交わる → 解2個（D&gt;0）</b> ／ <b>1点で接する → 解1個＝重解（D=0）</b> ／ <b>交わらない → 実数解なし（D&lt;0）</b>。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="yellow"><span class="bar"></span>③ 解き方１：平方根の利用</h2>
+    <div class="when-badge">使える場面：$bx$ の項がない（$x^2=k$ の形にできる）とき</div>
+    <p class="lead">$x^2$ だけを左辺に残して、両辺の平方根をとれば一瞬で解けます。かっこ付き $(x+m)^2=k$ の形でも、かっこの中身をまるごと1つの文字とみなせば同じ考え方が使えます。</p>
+
+    <b>例題A：$x^2-9=0$</b>
+    <div class="step-box" data-stepgroup="m1a">
+      <div class="step-line" data-step="0"><span class="step-tag">STEP1</span>定数項を右辺に移項する：$x^2=9$</div>
+      <div class="step-line" data-step="1"><span class="step-tag">STEP2</span>両辺の平方根をとる（±を忘れない）：$x=\pm\sqrt{9}=\pm3$</div>
+      <div class="step-line" data-step="2"><span class="step-tag">答え</span>$x=-3,\ 3$</div>
+    </div>
+    <div class="step-btn-row"><button class="step-btn" data-target="m1a">次のステップ →</button><button class="step-reset" data-target="m1a">はじめから</button></div>
+
+    <b style="display:block;margin-top:22px">例題B：$(x-2)^2=16$（かっこ付き）</b>
+    <div class="step-box" data-stepgroup="m1b">
+      <div class="step-line" data-step="0"><span class="step-tag">STEP1</span>かっこの中身を1つの文字とみなし、両辺の平方根をとる：$x-2=\pm\sqrt{16}=\pm4$</div>
+      <div class="step-line" data-step="1"><span class="step-tag">STEP2</span>$-2$ を右辺に移項する：$x=2\pm4$</div>
+      <div class="step-line" data-step="2"><span class="step-tag">答え</span>$x=2+4=6$ または $x=2-4=-2$</div>
+    </div>
+    <div class="step-btn-row"><button class="step-btn" data-target="m1b">次のステップ →</button><button class="step-reset" data-target="m1b">はじめから</button></div>
+  </div>
+
+  <div class="card">
+    <h2 class="orange"><span class="bar"></span>④ 解き方２：因数分解</h2>
+    <div class="when-badge">使える場面：左辺が整数のまま $(x-p)(x-q)=0$ の形に分解できるとき</div>
+    <p class="lead">「かけて $c$、たして $b$ になる2つの数」を見つけて $(x-p)(x-q)=0$ に変形します。$A\times B=0$ ならば $A=0$ または $B=0$（積が0の法則）を使うのがポイント。</p>
+
+    <b>例題：$x^2-5x+6=0$</b>
+    <div class="step-box" data-stepgroup="m2">
+      <div class="step-line" data-step="0"><span class="step-tag">STEP1</span>かけて $6$、たして $-5$ になる2数を探す → $-2$ と $-3$（$(-2)\times(-3)=6,\ (-2)+(-3)=-5$）</div>
+      <div class="step-line" data-step="1"><span class="step-tag">STEP2</span>見つけた2数で因数分解する：$(x-2)(x-3)=0$</div>
+      <div class="step-line" data-step="2"><span class="step-tag">STEP3</span>積が0の法則：$x-2=0$ または $x-3=0$</div>
+      <div class="step-line" data-step="3"><span class="step-tag">答え</span>$x=2,\ 3$</div>
+    </div>
+    <div class="step-btn-row"><button class="step-btn" data-target="m2">次のステップ →</button><button class="step-reset" data-target="m2">はじめから</button></div>
+    <div class="derive">同じ数を2回使う場合（例：$x^2-6x+9=0 \to (x-3)(x-3)=0$）は <b>重解</b>（解が1つに重なる）といい、判別式 $D=0$ に対応します。</div>
+  </div>
+
+  <div class="card">
+    <h2 class="purple"><span class="bar"></span>⑤ 解き方３：平方完成</h2>
+    <div class="when-badge">使える場面：因数分解できないときの主力（いつでも使える）</div>
+    <p class="lead">式を無理やり「解き方１（平方根の利用）」の形 $(x+p)^2=q$ に変形してしまう方法です。$x^2+bx$ に $\left(\dfrac{b}{2}\right)^2$ を足し引きするのがコツ。</p>
+
+    <b>例題：$x^2+4x+1=0$</b>
+    <div class="step-box" data-stepgroup="m3">
+      <div class="step-line" data-step="0"><span class="step-tag">STEP1</span>定数項を右辺に移項する：$x^2+4x=-1$</div>
+      <div class="step-line" data-step="1"><span class="step-tag">STEP2</span>$x$ の係数 $4$ の半分の2乗 $\left(\dfrac{4}{2}\right)^2=4$ を両辺に足す：$x^2+4x+4=-1+4$</div>
+      <div class="step-line" data-step="2"><span class="step-tag">STEP3</span>左辺を $(x+2)^2$ に変形する：$(x+2)^2=3$</div>
+      <div class="step-line" data-step="3"><span class="step-tag">STEP4</span>あとは「解き方１」と同じ。平方根をとる：$x+2=\pm\sqrt3$</div>
+      <div class="step-line" data-step="4"><span class="step-tag">答え</span>$x=-2\pm\sqrt3$</div>
+    </div>
+    <div class="step-btn-row"><button class="step-btn" data-target="m3">次のステップ →</button><button class="step-reset" data-target="m3">はじめから</button></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="bar"></span>⑥ 解き方４：解の公式</h2>
+    <div class="when-badge">使える場面：万能。因数分解できない・数字が汚くても必ず使える</div>
+    <p class="lead">「解き方３（平方完成）」を、具体的な数字ではなく $a,b,c$ のまま一般的にやると、次の公式が導けます（覚えて使うのが基本）。</p>
+    <div class="derive" style="text-align:center;font-size:1.15rem">
+      $$x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
+    </div>
+    <p class="lead">$b^2-4ac$ の部分を<b>判別式 $D$</b> と呼びます（②の中心装置で動かしていた値そのものです）。$D&lt;0$ のときは $\sqrt{\ }$ の中が負になるので、実数の解はありません。</p>
+
+    <b>例題：$2x^2-3x-1=0$</b>
+    <div class="step-box" data-stepgroup="m4">
+      <div class="step-line" data-step="0"><span class="step-tag">STEP1</span>係数を確認する：$a=2,\ b=-3,\ c=-1$</div>
+      <div class="step-line" data-step="1"><span class="step-tag">STEP2</span>判別式を計算する：$D=b^2-4ac=(-3)^2-4(2)(-1)=9+8=17$</div>
+      <div class="step-line" data-step="2"><span class="step-tag">STEP3</span>公式に代入する：$x=\dfrac{-(-3)\pm\sqrt{17}}{2\times2}=\dfrac{3\pm\sqrt{17}}{4}$</div>
+      <div class="step-line" data-step="3"><span class="step-tag">答え</span>$x=\dfrac{3\pm\sqrt{17}}{4}$（$\sqrt{17}$ はこれ以上簡単にならないのでそのまま）</div>
+    </div>
+    <div class="step-btn-row"><button class="step-btn" data-target="m4">次のステップ →</button><button class="step-reset" data-target="m4">はじめから</button></div>
+
+    <div class="derive">
+      <b>導出（発展）：</b> $ax^2+bx+c=0$ を平方完成すると
+      $x^2+\dfrac{b}{a}x=-\dfrac{c}{a} \to \left(x+\dfrac{b}{2a}\right)^2=\dfrac{b^2-4ac}{4a^2} \to x+\dfrac{b}{2a}=\pm\dfrac{\sqrt{b^2-4ac}}{2a} \to x=\dfrac{-b\pm\sqrt{b^2-4ac}}{2a}$
+      となり、公式が得られます。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="green"><span class="bar"></span>⑦ まとめ：どの解き方を選ぶ？</h2>
+    <p class="lead">実は「解の公式」だけ覚えればどんな二次方程式でも解けます。ただし、他の3つの方が<b>速く・きれいに</b>解ける場合が多いので、下のフローチャートの順にチェックする習慣をつけましょう。</p>
+    <div class="flow">
+      <div class="flow-box q">まず式を $ax^2+bx+c=0$ の形にする</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box q">$bx$ の項がない（$b=0$）？</div>
+      <div class="flow-branch">
+        <div>
+          <div class="flow-yn">YES</div>
+          <div class="flow-box flow-result">① 平方根の利用</div>
+        </div>
+        <div>
+          <div class="flow-yn">NO ↓</div>
+          <div class="flow-box q">整数のまま因数分解できる？</div>
+        </div>
+      </div>
+      <div class="flow-branch">
+        <div>
+          <div class="flow-yn">YES</div>
+          <div class="flow-box flow-result">② 因数分解</div>
+        </div>
+        <div>
+          <div class="flow-yn">NO</div>
+          <div class="flow-box flow-result">③ 平方完成 または ④ 解の公式<br><span style="font-weight:400;font-size:.85rem">（公式の方が速いのでおすすめ）</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="panel" id="quiz">
+
+  <div class="card">
+    <h2><span class="bar"></span>解きたいパターンを選ぼう</h2>
+    <p class="lead">4つの解き方をそれぞれ単独で練習したら、最後は <b>🔀総合ミックス</b> で「どの解き方を使うか」も含めて実戦テスト！</p>
+    <div class="qmode-tabs">
+      <button class="qmode active" data-qmode="sqrtm">① 平方根</button>
+      <button class="qmode" data-qmode="factor">② 因数分解</button>
+      <button class="qmode" data-qmode="square">③ 平方完成</button>
+      <button class="qmode" data-qmode="formula">④ 解の公式</button>
+      <button class="qmode mix" data-qmode="mix">🔀 総合ミックス</button>
+    </div>
+  </div>
+
+  <div class="card" id="q-wrap">
+    <div class="quiz-top">
+      <div class="score">⭐ <span id="q-points">0</span> pt</div>
+      <div class="score" style="color:var(--muted);font-weight:700">第 <span id="q-num">1</span> / 10 問</div>
+      <div class="streak">🔥 連続 <span id="q-streak">0</span></div>
+    </div>
+    <div class="progress-dots" id="q-dots"></div>
+    <div class="timer-wrap">
+      <div class="timer-bar"><div class="timer-fill" id="q-timer-fill"></div></div>
+      <div class="timer-num"><span id="q-timer-sec">30.0</span>秒</div>
+    </div>
+    <div class="q-box" id="q-box">
+      <div class="q-hint" id="q-hint">次の方程式を解こう</div>
+      <div class="q-ask" id="q-ask"></div>
+      <div class="choices" id="q-choices"></div>
+      <div class="feedback" id="q-feedback"></div>
+      <button class="next-btn" id="q-next" style="display:none">次の問題 →</button>
+    </div>
+    <div class="result" id="q-result">
+      <div class="result-emoji" id="r-emoji">🎉</div>
+      <div class="result-rank" id="r-rank"></div>
+      <div class="result-score"><span id="r-correct">0</span> / 10 <span class="small">正解</span></div>
+      <div class="result-points">獲得ポイント <b id="r-points">0</b> pt</div>
+      <div class="result-msg" id="r-msg"></div>
+      <div class="result-stars" id="r-stars"></div>
+      <button class="next-btn" id="q-retry">もう一度チャレンジ 🔁</button>
+    </div>
+  </div>
+
+  <p class="footer-note">© KATEぷら｜二次方程式マスター ― 4つの解き方を全部使えるようになる練習</p>
+</section>
+</main>
+
+<script>
+/* =========================================================
+   QUAD: 二次方程式の数式コアエンジン
+   （gcd / 平方根の簡約 / 分数の約分 / 判別式による解の構成）
+   ========================================================= */
+function gcd(a, b) { a=Math.abs(a); b=Math.abs(b); while(b){ const t=a%b; a=b; b=t; } return a||1; }
+
+function simplifySqrt(n) {
+  if (n === 0) return {coef:0, rad:1};
+  let coef = 1, rad = n;
+  for (let p = 2; p*p <= rad; p++) {
+    while (rad % (p*p) === 0) { rad /= (p*p); coef *= p; }
+  }
+  return {coef, rad};
+}
+
+function reduceFrac(num, den) {
+  if (den < 0) { num = -num; den = -den; }
+  const g = gcd(num, den) || 1;
+  return { num: num/g, den: den/g };
+}
+
+// D, N(numerator constant, i.e. usually -b), den(usually 2a) -> structured root result
+function buildResult(D, N, den) {
+  if (D < 0) return { D, type: 'none' };
+  if (D === 0) return { D, type: 'double', root: reduceFrac(N, den) };
+  const sd = simplifySqrt(D);
+  if (sd.rad === 1) {
+    const f1 = reduceFrac(N + sd.coef, den);
+    const f2 = reduceFrac(N - sd.coef, den);
+    return { D, type: 'rational', r1: f1, r2: f2 };
+  }
+  let n2 = N, coef = sd.coef, d2 = den;
+  const g = gcd(gcd(Math.abs(n2), coef), Math.abs(d2)) || 1;
+  n2 /= g; coef /= g; d2 /= g;
+  if (d2 < 0) { n2 = -n2; d2 = -d2; }
+  return { D, type: 'irrational', N: n2, coef, rad: sd.rad, den: d2 };
+}
+
+function solveQuadratic(a, b, c) {
+  const D = b*b - 4*a*c;
+  return buildResult(D, -b, 2*a);
+}
+
+function fracVal(f){ return f.num/f.den; }
+function resultNums(res) {
+  if (res.type === 'none') return null;
+  if (res.type === 'double') return [fracVal(res.root), fracVal(res.root)];
+  if (res.type === 'single') return [fracVal(res.val)];
+  if (res.type === 'rational') return [fracVal(res.r1), fracVal(res.r2)].sort((a,b)=>a-b);
+  if (res.type === 'irrational') { const s=Math.sqrt(res.rad); return [(res.N+res.coef*s)/res.den, (res.N-res.coef*s)/res.den].sort((a,b)=>a-b); }
+}
+function sameResult(r1, r2) {
+  if (r1.type==='none' && r2.type==='none') return true;
+  if (r1.type==='none' || r2.type==='none') return false;
+  const n1 = resultNums(r1), n2 = resultNums(r2);
+  if (n1.length !== n2.length) return false;
+  return n1.every((v,i)=>Math.abs(v-n2[i])<1e-9);
+}
+
+/* ---------- LaTeX整形 ---------- */
+function fmtFrac(num, den) {
+  if (den === 1) return `${num}`;
+  const sign = (num < 0) ? '-' : '';
+  return `${sign}\\frac{${Math.abs(num)}}{${den}}`;
+}
+function fmtSqrtTerm(coef, rad) {
+  if (rad === 1) return `${coef}`;
+  if (coef === 1) return `\\sqrt{${rad}}`;
+  return `${coef}\\sqrt{${rad}}`;
+}
+function fmtSignedNum(n) { return n < 0 ? `-${Math.abs(n)}` : `${n}`; }
+
+function formatAnswer(res) {
+  if (res.type === 'none') return '実数解なし';
+  if (res.type === 'double') return `x=${fmtFrac(res.root.num, res.root.den)}\\ (\\text{重解})`;
+  if (res.type === 'single') return `x=${fmtFrac(res.val.num, res.val.den)}`;
+  if (res.type === 'rational') {
+    const items = [res.r1, res.r2].slice().sort((a,b)=>fracVal(a)-fracVal(b));
+    return `x=${fmtFrac(items[0].num,items[0].den)},\\ ${fmtFrac(items[1].num,items[1].den)}`;
+  }
+  if (res.type === 'irrational') {
+    const sqrtStr = fmtSqrtTerm(res.coef, res.rad);
+    const body = res.N === 0 ? `\\pm ${sqrtStr}` : `${fmtSignedNum(res.N)} \\pm ${sqrtStr}`;
+    if (res.den === 1) return `x=${body}`;
+    return `x=\\dfrac{${body}}{${res.den}}`;
+  }
+}
+
+function buildQuadLatex(a,b,c) {
+  let s = '';
+  s += (a===1?'':a===-1?'-':a) + 'x^2';
+  if (b !== 0) s += (b>0?'+':'-') + (Math.abs(b)===1?'':Math.abs(b)) + 'x';
+  if (c !== 0) s += (c>0?'+':'-') + Math.abs(c);
+  s += '=0';
+  return s;
+}
+
+/* ---------- まちがい選択肢（distractor）の生成 ---------- */
+function mistakeCandidates(a,b,c) {
+  const D = b*b-4*a*c;
+  const cands = [];
+  cands.push(buildResult(D, b, 2*a));                 // T1: 符号ミス（-bを+bと間違える）
+  const D2 = b*b + 4*a*c;
+  cands.push(buildResult(D2, -b, 2*a));                // T2: 判別式の符号ミス
+  if (Math.abs(a) !== 1) cands.push(buildResult(D, -b, 2)); // T3: 分母の a を忘れる
+  if (D > 0) {
+    const full = buildResult(D, -b, 2*a);
+    if (full.type === 'rational') cands.push({ type:'single', val: full.r1 }); // T4: ±を忘れて片方だけ
+  }
+  const D4 = b*b - 4*c;
+  if (a !== 1) cands.push(buildResult(D4, -b, 2*a));   // T5: cにaを掛け忘れる
+  return cands;
+}
+function pickDistractors(a,b,c, count) {
+  count = count || 3;
+  const correct = solveQuadratic(a,b,c);
+  const pool = mistakeCandidates(a,b,c);
+  const chosen = [];
+  for (const cand of pool) {
+    if (chosen.length >= count) break;
+    if (sameResult(cand, correct)) continue;
+    if (chosen.some(ch => sameResult(ch, cand))) continue;
+    chosen.push(cand);
+  }
+  let tries = 0;
+  while (chosen.length < count && tries < 30) {
+    tries++;
+    const jc = c + (tries%2===0 ? tries : -tries);
+    const cand = solveQuadratic(a, b, jc);
+    if (sameResult(cand, correct)) continue;
+    if (chosen.some(ch => sameResult(ch, cand))) continue;
+    chosen.push(cand);
+  }
+  return { correct, distractors: chosen.slice(0,count) };
+}
+
+/* =========================================================
+   問題生成（4モード）
+   ========================================================= */
+function randInt(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
+function randNonZero(min, max) { let v; do { v = randInt(min,max); } while (v===0); return v; }
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+function genSqrtProblem() {
+  const sub = pick(['simple','paren']);
+  if (sub === 'simple') {
+    const a = pick([1,1,1,2,3]);
+    const x0 = randInt(1,8);
+    const perfect = Math.random() < 0.6;
+    const k = perfect ? x0*x0 : randInt(2,40);
+    const c = -a*k;
+    const res = solveQuadratic(a, 0, c);
+    return { mode:'sqrtm', eqLatex: buildQuadLatex(a,0,c), res, a, b:0, c,
+      steps: sqrtStepsSimple(a,c,res) };
+  } else {
+    const m = randNonZero(-6,6);
+    const perfect = Math.random() < 0.6;
+    const n = perfect ? [1,4,9,16,25,36][randInt(0,5)] : randInt(2,40);
+    const a=1, b=2*m, c=m*m-n;
+    const sign = m>=0 ? '+' : '-';
+    const eqLatex = `(x${sign}${Math.abs(m)})^2=${n}`;
+    const res = solveQuadratic(a,b,c);
+    return { mode:'sqrtm', eqLatex, res, a, b, c, m, n, steps: sqrtStepsParen(m,n,res) };
+  }
+}
+function sqrtStepsSimple(a,c,res){
+  const k = -c/a;
+  const steps = [];
+  steps.push(`定数項を移項して $x^2=${k}$ の形にする`);
+  if (res.type==='irrational' || (res.type==='rational' && res.r1.den===1 && !Number.isInteger(Math.sqrt(k)))) {
+    // still fine, generic
+  }
+  steps.push(`両辺の平方根をとる：$x=\\pm\\sqrt{${k}}$`);
+  steps.push(`答え：$${formatAnswer(res)}$`);
+  return steps;
+}
+function sqrtStepsParen(m,n,res){
+  const sign = m>=0?'+':'-';
+  const steps = [];
+  steps.push(`かっこの中身を1つの文字とみなし、両辺の平方根をとる：$x${sign}${Math.abs(m)}=\\pm\\sqrt{${n}}$`);
+  steps.push(`$${m}$ を移項して $x$ について解く`);
+  steps.push(`答え：$${formatAnswer(res)}$`);
+  return steps;
+}
+
+function genFactorProblem() {
+  let p = randNonZero(-9,9), q = randNonZero(-9,9);
+  if (Math.random() < 0.15) q = p;
+  const a = 1, b = -(p+q), c = p*q;
+  const res = solveQuadratic(a,b,c);
+  const eqLatex = buildQuadLatex(a,b,c);
+  const steps = [
+    `かけて $${c}$、たして $${b}$ になる2数を探す → $${p}$ と $${q}$`,
+    `見つけた2数で因数分解する：$(x${p>=0?'-':'+'}${Math.abs(p)})(x${q>=0?'-':'+'}${Math.abs(q)})=0$`,
+    `積が0の法則より $x${p>=0?'-':'+'}${Math.abs(p)}=0$ または $x${q>=0?'-':'+'}${Math.abs(q)}=0$`,
+    `答え：$${formatAnswer(res)}$`
+  ];
+  return { mode:'factor', eqLatex, res, a,b,c,p,q, steps };
+}
+
+function genCompleteSquareProblem() {
+  const half = randNonZero(-6,6);
+  const b = 2*half, c = randInt(-15,15), a = 1;
+  const res = solveQuadratic(a,b,c);
+  const eqLatex = buildQuadLatex(a,b,c);
+  const rhs = -c + half*half;
+  const steps = [
+    `定数項を移項する：$x^2${b>=0?'+':''}${b===0?'':b}x=${-c}$`,
+    `$x$ の係数の半分の2乗 $\\left(\\dfrac{${b}}{2}\\right)^2=${half*half}$ を両辺に足す`,
+    `左辺を平方の形にする：$(x${half>=0?'+':''}${half})^2=${rhs}$`,
+    rhs>=0 ? `平方根をとって解く：$x${half>=0?'+':''}${half}=\\pm\\sqrt{${rhs}}$` : `右辺が負なので実数解はない`,
+    `答え：$${formatAnswer(res)}$`
+  ];
+  return { mode:'square', eqLatex, res, a,b,c, steps };
+}
+
+function genFormulaProblem() {
+  const a = pick([1,1,2,2,3,-1,-2]);
+  const b = randInt(-10,10), c = randInt(-10,10);
+  const res = solveQuadratic(a,b,c);
+  const eqLatex = buildQuadLatex(a,b,c);
+  const D = b*b-4*a*c;
+  const steps = [
+    `係数を確認する：$a=${a},\\ b=${b},\\ c=${c}$`,
+    `判別式を計算する：$D=b^2-4ac=(${b})^2-4(${a})(${c})=${D}$`,
+    D>=0 ? `公式に代入する：$x=\\dfrac{-(${b})\\pm\\sqrt{${D}}}{2\\times${a}}$` : `$D<0$ なので実数解はない`,
+    `答え：$${formatAnswer(res)}$`
+  ];
+  return { mode:'formula', eqLatex, res, a,b,c, steps };
+}
+
+const GENERATORS = { sqrtm: genSqrtProblem, factor: genFactorProblem, square: genCompleteSquareProblem, formula: genFormulaProblem };
+function genForMode(mode){
+  if (mode === 'mix') { const m = pick(['sqrtm','factor','square','formula']); return GENERATORS[m](); }
+  return GENERATORS[mode]();
+}
+
+/* =========================================================
+   中心装置（a,b,cスライダー + 放物線グラフ）
+   ========================================================= */
+const abcEls = {
+  a: document.getElementById('abc-a'), b: document.getElementById('abc-b'), c: document.getElementById('abc-c'),
+  aVal: document.getElementById('abc-a-val'), bVal: document.getElementById('abc-b-val'), cVal: document.getElementById('abc-c-val'),
+  eq: document.getElementById('abc-eq'), D: document.getElementById('abc-D'), count: document.getElementById('abc-count'),
+  reco: document.getElementById('abc-reco'), quick: document.getElementById('abc-quick'),
+  curve: document.getElementById('pb-curve'), root1: document.getElementById('pb-root1'), root2: document.getElementById('pb-root2')
+};
+let lastA = 1;
+const PLOT = { x0:20, x1:300, y0:20, y1:230, xMin:-7, xMax:7 };
+function xToPx(x){ return PLOT.x0 + (x-PLOT.xMin)/(PLOT.xMax-PLOT.xMin)*(PLOT.x1-PLOT.x0); }
+
+function updateABC(){
+  let a = +abcEls.a.value, b = +abcEls.b.value, c = +abcEls.c.value;
+  if (a === 0) { a = lastA >= 0 ? 1 : -1; abcEls.a.value = a; }
+  lastA = a;
+  abcEls.aVal.textContent = a; abcEls.bVal.textContent = b; abcEls.cVal.textContent = c;
+  abcEls.eq.innerHTML = `$${buildQuadLatex(a,b,c)}$`;
+
+  const D = b*b - 4*a*c;
+  abcEls.D.textContent = D;
+  abcEls.count.textContent = D>0 ? '2個' : (D===0 ? '1個（重解）' : '0個');
+
+  // グラフ描画：xMin〜xMaxをサンプリングしてyの範囲を自動フィット
+  const N = 60;
+  const pts = [];
+  let yMin = 0, yMax = 0;
+  for (let i=0;i<=N;i++){
+    const x = PLOT.xMin + (PLOT.xMax-PLOT.xMin)*i/N;
+    const y = a*x*x + b*x + c;
+    pts.push([x,y]);
+    if (y<yMin) yMin=y; if (y>yMax) yMax=y;
+  }
+  const pad = (yMax-yMin)*0.1 || 1;
+  yMin -= pad; yMax += pad;
+  const yToPx = (y)=> PLOT.y1 - (y-yMin)/(yMax-yMin)*(PLOT.y1-PLOT.y0);
+  const d = pts.map((p,i)=> `${i===0?'M':'L'} ${xToPx(p[0]).toFixed(1)} ${yToPx(p[1]).toFixed(1)}`).join(' ');
+  abcEls.curve.setAttribute('d', d);
+
+  // x軸(y=0)とy軸(x=0)の描画位置もデータに合わせて更新
+  document.getElementById('pb-xaxis').setAttribute('y1', yToPx(0)); document.getElementById('pb-xaxis').setAttribute('y2', yToPx(0));
+  document.getElementById('pb-yaxis').setAttribute('x1', xToPx(0)); document.getElementById('pb-yaxis').setAttribute('x2', xToPx(0));
+
+  // 解（x軸との交点）
+  const res = solveQuadratic(a,b,c);
+  const nums = resultNums(res);
+  const showRoot = (el, x)=>{
+    if (x===null || x===undefined || x < PLOT.xMin || x > PLOT.xMax) { el.style.display='none'; return; }
+    el.style.display=''; el.setAttribute('cx', xToPx(x)); el.setAttribute('cy', yToPx(0));
+  };
+  if (!nums) { showRoot(abcEls.root1,null); showRoot(abcEls.root2,null); }
+  else if (nums.length===1 || nums[0]===nums[1]) { showRoot(abcEls.root1, nums[0]); showRoot(abcEls.root2,null); }
+  else { showRoot(abcEls.root1, nums[0]); showRoot(abcEls.root2, nums[1]); }
+
+  // おすすめの解き方
+  let reco, ok=true;
+  if (b === 0) reco = '💡 bx の項がない → 「① 平方根の利用」が最速！';
+  else if (D >= 0 && Number.isInteger(Math.sqrt(D)) && a===1) reco = '💡 整数のまま因数分解できる → 「② 因数分解」が使える！';
+  else if (D < 0) { reco = '⚠️ D<0 なので実数解なし（グラフはx軸と交わらない）'; ok=false; }
+  else reco = '💡 因数分解しにくい → 「③ 平方完成」または「④ 解の公式」を使おう';
+  abcEls.reco.textContent = reco;
+  abcEls.reco.className = 'reco-badge' + (ok?'':' none');
+
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([abcEls.eq]);
+}
+[abcEls.a, abcEls.b, abcEls.c].forEach(el=> el.addEventListener('input', updateABC));
+
+const ABC_PRESETS = [
+  {label:'x²-9=0', a:1,b:0,c:-9},
+  {label:'x²-5x+6=0', a:1,b:-5,c:6},
+  {label:'x²+4x+1=0', a:1,b:4,c:1},
+  {label:'2x²-3x-1=0', a:2,b:-3,c:-1},
+];
+ABC_PRESETS.forEach(p=>{
+  const btn = document.createElement('button');
+  btn.textContent = p.label;
+  btn.onclick = ()=>{ abcEls.a.value=p.a; abcEls.b.value=p.b; abcEls.c.value=p.c; lastA=p.a; updateABC(); };
+  abcEls.quick.appendChild(btn);
+});
+updateABC();
+
+/* =========================================================
+   学習タブ：ステップ表示（次へ／はじめから）
+   ========================================================= */
+const stepShown = {}; // stepgroupキー -> 現在表示済みのステップ数（reset/次へ両方から共有）
+document.querySelectorAll('.step-box').forEach(box=>{ stepShown[box.dataset.stepgroup] = 0; });
+document.querySelectorAll('.step-btn').forEach(btn=>{
+  const key = btn.dataset.target;
+  btn.addEventListener('click', ()=>{
+    const gl = document.querySelectorAll(`.step-box[data-stepgroup="${key}"] .step-line`);
+    let shown = stepShown[key];
+    if (shown < gl.length) { gl[shown].classList.add('show'); shown++; stepShown[key] = shown; }
+    if (shown >= gl.length) btn.disabled = true;
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([gl[shown-1]]);
+  });
+});
+document.querySelectorAll('.step-reset').forEach(btn=>{
+  const key = btn.dataset.target;
+  btn.addEventListener('click', ()=>{
+    const gl = document.querySelectorAll(`.step-box[data-stepgroup="${key}"] .step-line`);
+    gl.forEach(l=>l.classList.remove('show'));
+    stepShown[key] = 0;
+    const stepBtn = document.querySelector(`.step-btn[data-target="${key}"]`);
+    stepBtn.disabled = false;
+  });
+});
+
+/* =========================================================
+   タブ切り替え
+   ========================================================= */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+    if (t.dataset.tab==='quiz') { if(!answered) resumeTimer(); }
+    else { stopTimer(); }
+  };
+});
+
+/* =========================================================
+   問題タブ：クイズエンジン（5モード共通）
+   ========================================================= */
+const MAX_Q = 10;
+const QUIZ_TIME = 30;
+let qMode = 'sqrtm';
+let total=0, correct=0, streak=0, answered=false, points=0, qNum=0;
+let timerId=null, remaining=QUIZ_TIME;
+let curProblem = null;
+
+document.querySelectorAll('.qmode').forEach(b=>{
+  b.onclick=()=>{
+    qMode = b.dataset.qmode;
+    document.querySelectorAll('.qmode').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    startQuiz();
+  };
+});
+
+function buildDots(){
+  const d=document.getElementById('q-dots'); d.innerHTML='';
+  for(let i=0;i<MAX_Q;i++){ const s=document.createElement('div'); s.className='dot'; d.appendChild(s); }
+}
+function markDot(i,ok){
+  const dots=document.querySelectorAll('#q-dots .dot');
+  if(dots[i]){ dots[i].classList.remove('cur'); dots[i].classList.add(ok?'ok':'ng'); }
+}
+function highlightCurrentDot(){
+  const dots=document.querySelectorAll('#q-dots .dot');
+  dots.forEach(x=>x.classList.remove('cur'));
+  if(dots[qNum-1]) dots[qNum-1].classList.add('cur');
+}
+function stopTimer(){ if(timerId){clearInterval(timerId); timerId=null;} }
+function renderTimer(){
+  const fill=document.getElementById('q-timer-fill');
+  const pct=Math.max(0,remaining/QUIZ_TIME*100);
+  fill.style.width=pct+'%';
+  fill.className='timer-fill'+(pct<=25?' danger':(pct<=50?' warn':''));
+  document.getElementById('q-timer-sec').textContent=remaining.toFixed(1);
+}
+function startTimer(){
+  stopTimer();
+  remaining=QUIZ_TIME; renderTimer();
+  timerId=setInterval(()=>{
+    remaining=Math.max(0,remaining-0.1);
+    renderTimer();
+    if(remaining<=0){ stopTimer(); timeUp(); }
+  },100);
+}
+function resumeTimer(){ if(!answered) startTimer(); }
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function nextProblem(){
+  answered=false;
+  curProblem = genForMode(qMode);
+  document.getElementById('q-ask').innerHTML = `次の方程式を解け：$${curProblem.eqLatex}$`;
+  const correctTex = formatAnswer(curProblem.res);
+  const { distractors } = pickDistractors(curProblem.a, curProblem.b, curProblem.c, 3);
+  const choiceTexts = shuffle([correctTex, ...distractors.map(formatAnswer)]);
+  const box = document.getElementById('q-choices');
+  box.innerHTML='';
+  choiceTexts.forEach(tex=>{
+    const b = document.createElement('button');
+    b.className='choice'; b.innerHTML = `$${tex}$`; b._tex = tex;
+    b.onclick = ()=> selectAnswer(b, tex===correctTex, correctTex);
+    box.appendChild(b);
+  });
+  document.getElementById('q-feedback').classList.remove('show');
+  document.getElementById('q-next').style.display='none';
+  highlightCurrentDot();
+  startTimer();
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([document.getElementById('q-ask'), box]);
+}
+
+function showFeedback(ok, correctTex){
+  const fb = document.getElementById('q-feedback');
+  fb.className = 'feedback show ' + (ok?'ok':'ng');
+  const stepsHtml = curProblem.steps.map(s=>`・${s}`).join('<br>');
+  fb.innerHTML = `<div class="fb-head ${ok?'ok':'ng'}">${ok?'⭕ 正解！':'❌ 不正解'}</div>
+    <div>正解：$${correctTex}$</div>
+    <div class="fb-steps">${stepsHtml}</div>`;
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([fb]);
+}
+
+function updateScore(){
+  document.getElementById('q-points').textContent = points;
+  document.getElementById('q-streak').textContent = streak;
+  document.getElementById('q-num').textContent = Math.min(qNum, MAX_Q);
+}
+
+function setNextButton(){
+  const nb = document.getElementById('q-next');
+  nb.style.display='block';
+  nb.textContent = (qNum>=MAX_Q) ? '結果を見る →' : '次の問題 →';
+}
+
+function timeUp(){
+  if (answered) return;
+  answered = true; total++;
+  const correctTex = formatAnswer(curProblem.res);
+  document.querySelectorAll('.choice').forEach(b=>{ b.disabled=true; if (b._tex===correctTex) b.classList.add('correct'); });
+  streak = 0; markDot(qNum-1,false); updateScore(); setNextButton();
+  showFeedback(false, correctTex);
+}
+
+function selectAnswer(btn, ok, correctTex){
+  if (answered) return;
+  answered = true; total++;
+  stopTimer();
+  const usedRemaining = remaining;
+  document.querySelectorAll('.choice').forEach(b=>{ b.disabled=true; if (b._tex===correctTex) b.classList.add('correct'); });
+  let earned = 0;
+  if (ok) {
+    correct++; streak++;
+    const base=50, speed=Math.round((usedRemaining/QUIZ_TIME)*50), streakBonus=(streak>=3)?20:0;
+    earned = base+speed+streakBonus; points += earned;
+  } else {
+    btn.classList.add('wrong'); streak = 0;
+  }
+  markDot(qNum-1, ok);
+  updateScore();
+  setNextButton();
+  showFeedback(ok, correctTex);
+}
+
+document.getElementById('q-next').addEventListener('click', ()=>{
+  if (qNum >= MAX_Q) { showResult(); return; }
+  qNum++;
+  nextProblem();
+});
+
+function rankFor(pct){
+  if (pct>=90) return {emoji:'🏆', rank:'パーフェクトマスター！', msg:'4つの解き方を完璧に使い分けられています。この調子！'};
+  if (pct>=70) return {emoji:'🎉', rank:'かなり得意！', msg:'ミスした問題だけもう一度見直してみよう。'};
+  if (pct>=50) return {emoji:'💪', rank:'あと少し！', msg:'②の中心装置で「どの解き方を選ぶか」をもう一度確認しよう。'};
+  return {emoji:'📘', rank:'ここからが伸びしろ！', msg:'学習タブの「④STEPで確認」をもう一度やってから再挑戦しよう。'};
+}
+function showResult(){
+  stopTimer();
+  document.getElementById('q-box').style.display='none';
+  const res = document.getElementById('q-result');
+  res.classList.add('show');
+  const pct = Math.round(correct/MAX_Q*100);
+  const info = rankFor(pct);
+  document.getElementById('r-emoji').textContent = info.emoji;
+  document.getElementById('r-rank').textContent = info.rank;
+  document.getElementById('r-correct').textContent = correct;
+  document.getElementById('r-points').textContent = points;
+  document.getElementById('r-msg').textContent = info.msg;
+  const starsN = pct>=90?5:pct>=70?4:pct>=50?3:pct>=30?2:1;
+  const starsEl = document.getElementById('r-stars');
+  starsEl.innerHTML='';
+  for(let i=0;i<5;i++){
+    const s=document.createElement('span');
+    s.className='star'; s.textContent = i<starsN?'★':'☆';
+    s.style.animationDelay=(i*0.12)+'s';
+    starsEl.appendChild(s);
+  }
+}
+document.getElementById('q-retry').addEventListener('click', startQuiz);
+
+function startQuiz(){
+  total=0; correct=0; streak=0; points=0; qNum=1; answered=false;
+  document.getElementById('q-box').style.display='';
+  document.getElementById('q-result').classList.remove('show');
+  buildDots();
+  updateScore();
+  nextProblem();
+}
+startQuiz();
+</script>
+</body>
+</html>
